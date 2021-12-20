@@ -15,6 +15,7 @@ module Simpler
       @request.env['simpler.action'] = action
 
       set_default_headers
+      params[:id] = set_request_param
       send(action)
       write_response
 
@@ -22,6 +23,10 @@ module Simpler
     end
 
     private
+
+    def set_request_param
+      @request.env['REQUEST_PATH'].split('/')[2]
+    end
 
     def extract_name
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
