@@ -2,7 +2,6 @@ require_relative 'view'
 
 module Simpler
   class Controller
-
     attr_reader :name, :request, :response
 
     def initialize(env)
@@ -41,9 +40,16 @@ module Simpler
     end
 
     def write_response
-      body = render_body
+      body = render_plain || render_body
 
       @response.write(body)
+    end
+
+    def render_plain
+      return unless @request.env['simpler.template'].is_a?(Hash)
+
+      @response['Content-Type'] = 'text/plain'
+      @request.env['simpler.template'][:plain]
     end
 
     def render_body
@@ -57,6 +63,5 @@ module Simpler
     def render(template)
       @request.env['simpler.template'] = template
     end
-
   end
 end
