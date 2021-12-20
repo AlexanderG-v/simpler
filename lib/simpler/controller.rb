@@ -2,7 +2,6 @@ require_relative 'view'
 
 module Simpler
   class Controller
-
     attr_reader :name, :request, :response
 
     def initialize(env)
@@ -16,6 +15,7 @@ module Simpler
       @request.env['simpler.action'] = action
 
       set_default_headers
+      params[:id] = set_request_param
       send(action)
       write_response
 
@@ -23,6 +23,10 @@ module Simpler
     end
 
     private
+
+    def set_request_param
+      @request.env['REQUEST_PATH'].split('/')[2]
+    end
 
     def extract_name
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
@@ -32,10 +36,25 @@ module Simpler
       @response['Content-Type'] = 'text/html'
     end
 
+    def status(value)
+      @response.status = value
+    end
+
+    def headers
+      @response
+    end
+
     def write_response
-      body = render_body
+      body = render_plain || render_body
 
       @response.write(body)
+    end
+
+    def render_plain
+      return unless @request.env['simpler.template'].is_a?(Hash)
+
+      @response['Content-Type'] = 'text/plain'
+      @request.env['simpler.template'][:plain]
     end
 
     def render_body
@@ -49,6 +68,5 @@ module Simpler
     def render(template)
       @request.env['simpler.template'] = template
     end
-
   end
 end

@@ -28,6 +28,7 @@ module Simpler
 
     def call(env)
       route = @router.route_for(env)
+      return bad_request unless route
       controller = route.controller.new(env)
       action = route.action
 
@@ -35,6 +36,12 @@ module Simpler
     end
 
     private
+
+    def bad_request
+      response = Rack::Response.new
+      response.status = 404
+      response.finish
+    end
 
     def require_app
       Dir["#{Simpler.root}/app/**/*.rb"].each { |file| require file }
