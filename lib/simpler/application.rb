@@ -38,7 +38,9 @@ module Simpler
     private
 
     def bad_request
-      [404, {'Content-Type' => 'text/plain'}, ['404 Not Found']]
+      response = Rack::Response.new
+      response.status = 404
+      response.finish
     end
 
     def require_app

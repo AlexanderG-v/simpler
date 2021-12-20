@@ -3,3 +3,4 @@ require_relative 'config/environment'
 
 use Applogger, logdev: File.expand_path('log/app.log', __dir__)
 run Simpler.application
+use Rack::ContentType, "text/plain"
